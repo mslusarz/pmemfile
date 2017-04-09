@@ -33,8 +33,8 @@ option(TESTS_USE_FORCED_PMEM "let tests force enable or force disable use of opt
 
 set(GLOBAL_TEST_ARGS
 	-DMATCH_SCRIPT=${PROJECT_SOURCE_DIR}/tests/match
-	-DMKFS_EXECUTABLE=$<TARGET_FILE:mkfs.pmemfile>
-	-DCAT_EXECUTABLE=$<TARGET_FILE:pmemfile-cat>
+#	-DMKFS_EXECUTABLE=$<TARGET_FILE:mkfs.pmemfile>
+#	-DCAT_EXECUTABLE=$<TARGET_FILE:pmemfile-cat>
 	-DPARENT_DIR=${TEST_DIR}/
 	-DTESTS_USE_FORCED_PMEM=${TESTS_USE_FORCED_PMEM})
 

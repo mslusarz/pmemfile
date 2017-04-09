@@ -48,13 +48,15 @@ ExternalProject_Add(
 	DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}
 	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
 	INSTALL_COMMAND ""
-	CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+	CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DBUILD_SHARED_LIBS=1
+#	PATCH_COMMAND ${PATCH_EXECUTABLE} -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/gtest.patch
 )
 ExternalProject_Get_Property(gtest source_dir binary_dir)
 add_library(libgtest IMPORTED STATIC GLOBAL)
 add_dependencies(libgtest gtest)
 set_target_properties(libgtest PROPERTIES
-	"IMPORTED_LOCATION" "${binary_dir}/googlemock/gtest/libgtest.a"
+#	"IMPORTED_LOCATION" "${binary_dir}/googlemock/gtest/libgtest.a"
+	"IMPORTED_LOCATION" "${binary_dir}/googlemock/gtest/Debug/gtest.lib"
 	"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 )
 include_directories("${source_dir}/googletest/include")
@@ -92,7 +94,7 @@ build_test(file_basic basic/basic.cpp)
 build_test(file_crash crash/crash.cpp)
 build_test(file_dirs dirs/dirs.cpp)
 build_test(file_getdents getdents/getdents.cpp)
-build_test(file_mt mt/mt.cpp)
+#build_test(file_mt mt/mt.cpp)
 build_test(file_openp openp/openp.cpp)
 build_test(file_permissions permissions/permissions.cpp)
 build_test(file_rw rw/rw.cpp)
@@ -138,8 +140,11 @@ function(add_test_generic name tracer)
 			${ARGV2}
 			-P ${CMAKE_CURRENT_SOURCE_DIR}/${name}/test.cmake)
 
+	set(P "$ENV{PATH};${CMAKE_CURRENT_BINARY_DIR}\\gtest\\src\\gtest-build\\googlemock\\gtest\\Debug")
+	string(REPLACE ";" "\\;" P "${P}")
+
 	set_tests_properties(${name}_${tracer} PROPERTIES
-		ENVIRONMENT "LC_ALL=C;PATH=$ENV{PATH};${ARGV3}")
+		ENVIRONMENT "LC_ALL=C;PATH=${P};${ARGV3}")
 endfunction()
 
 add_test_generic(basic none)
@@ -157,11 +162,11 @@ add_test_generic(getdents none)
 add_test_generic(getdents memcheck)
 add_test_generic(getdents pmemcheck)
 
-add_test_generic(mt none      -Dops=10000)
-add_test_generic(mt memcheck  -Dops=10)
-add_test_generic(mt helgrind  -Dops=20)
-add_test_generic(mt drd       -Dops=20)
-add_test_generic(mt pmemcheck -Dops=50)
+#add_test_generic(mt none      -Dops=10000)
+#add_test_generic(mt memcheck  -Dops=10)
+#add_test_generic(mt helgrind  -Dops=20)
+#add_test_generic(mt drd       -Dops=20)
+#add_test_generic(mt pmemcheck -Dops=50)
 
 add_test_generic(openp none)
 add_test_generic(openp memcheck)
